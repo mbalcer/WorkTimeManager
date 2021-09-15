@@ -1,24 +1,21 @@
 package pl.mbalcer.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class MonthYear extends PanacheEntity {
 
     private Integer month;
-
     private Integer year;
-
-    public MonthYear(Integer month, Integer year) {
-        this.month = month;
-        this.year = year;
-    }
-
-    public MonthYear() {
-    }
 
     public static MonthYear findByTodayDate(LocalDateTime now) {
         int nowMonth = now.getMonth().getValue();
@@ -29,13 +26,5 @@ public class MonthYear extends PanacheEntity {
             monthYear.persist();
         }
         return monthYear;
-    }
-
-    @Override
-    public String toString() {
-        return "MonthYear{" +
-                "month=" + month +
-                ", year=" + year +
-                '}';
     }
 }
