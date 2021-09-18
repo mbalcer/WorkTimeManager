@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -20,4 +21,12 @@ public class WorkTime extends PanacheEntity {
 
     @ManyToOne
     private MonthYear monthYear;
+
+    public static WorkTime findTodayWorkTime(LocalDateTime now) {
+        WorkTime todayWorkTime = WorkTime.find("dayOfMonth", now.getDayOfMonth()).firstResult();
+        if (todayWorkTime == null) {
+            todayWorkTime = new WorkTime(null, null, now.getDayOfMonth(), MonthYear.findByTodayDate(now));
+        }
+        return todayWorkTime;
+    }
 }
