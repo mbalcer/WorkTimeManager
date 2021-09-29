@@ -20,11 +20,15 @@ public class MonthYear extends PanacheEntity {
     public static MonthYear findByTodayDate(LocalDateTime now) {
         int nowMonth = now.getMonth().getValue();
         int nowYear = now.getYear();
-        MonthYear monthYear = MonthYear.find("month = ?1 AND year = ?2", nowMonth, nowYear).firstResult();
+        MonthYear monthYear = findByMonthAndYear(nowMonth, nowYear);
         if (monthYear == null) {
             monthYear = new MonthYear(nowMonth, nowYear);
             monthYear.persist();
         }
         return monthYear;
+    }
+
+    public static MonthYear findByMonthAndYear(int month, int year) {
+        return MonthYear.find("month = ?1 AND year = ?2", month, year).firstResult();
     }
 }

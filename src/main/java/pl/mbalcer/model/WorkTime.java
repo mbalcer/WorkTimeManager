@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,5 +29,9 @@ public class WorkTime extends PanacheEntity {
             todayWorkTime = new WorkTime(null, null, now.getDayOfMonth(), MonthYear.findByTodayDate(now));
         }
         return todayWorkTime;
+    }
+
+    public static List<WorkTime> findAllByMonth(MonthYear monthYear) {
+        return WorkTime.find("monthYear", monthYear).list();
     }
 }
