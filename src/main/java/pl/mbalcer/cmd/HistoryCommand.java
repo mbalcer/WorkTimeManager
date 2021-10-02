@@ -4,8 +4,11 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
+import pl.mbalcer.repository.MonthYearRepository;
+import pl.mbalcer.repository.WorkTimeRepository;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -33,6 +36,12 @@ public class HistoryCommand implements Runnable {
     @Option(names = {"--end", "-e"}, defaultValue = "16:00", description = "End working time in format HH:mm")
     String end;
 
+    @Inject
+    MonthYearRepository monthYearRepository;
+
+    @Inject
+    WorkTimeRepository workTimeRepository;
+
     @Transactional
     @Override
     public void run() {
@@ -42,9 +51,9 @@ public class HistoryCommand implements Runnable {
         LocalTime startTime = LocalTime.parse(start, timeFormatter);
         LocalTime endTime = LocalTime.parse(end, timeFormatter);
 
-        MonthYear monthYear = MonthYear.findByMonthAndYear(localDate.getMonthValue(), localDate.getYear());
+        MonthYear monthYear = monthYearRepository.findByMonthAndYear(localDate.getMonthValue(), localDate.getYear());
         WorkTime workTime = new WorkTime(startTime, endTime, localDate.getDayOfMonth(), monthYear);
-        workTime.persist();
+        workTimeRepository.persist(workTime);
         System.out.println(workTime);
     }
 }

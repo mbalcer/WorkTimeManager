@@ -2,10 +2,12 @@ package pl.mbalcer.cmd;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
+import pl.mbalcer.repository.MonthYearRepository;
+import pl.mbalcer.repository.WorkTimeRepository;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +20,12 @@ public class PrintCommand implements Runnable {
     @Option(names = {"--month", "-m"})
     Integer month;
 
+    @Inject
+    MonthYearRepository monthYearRepository;
+
+    @Inject
+    WorkTimeRepository workTimeRepository;
+
     @Transactional
     @Override
     public void run() {
@@ -25,7 +33,7 @@ public class PrintCommand implements Runnable {
         if (month == null) {
             month = today.getMonthValue();
         }
-        List<WorkTime> allByMonth = WorkTime.findAllByMonth(MonthYear.findByMonthAndYear(month, today.getYear()));
+        List<WorkTime> allByMonth = workTimeRepository.findAllByMonth(monthYearRepository.findByMonthAndYear(month, today.getYear()));
         allByMonth.forEach(workTime -> {
             long minutes = ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime());
             long hours = ChronoUnit.HOURS.between(workTime.getStartTime(), workTime.getEndTime());
