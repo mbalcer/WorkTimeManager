@@ -1,5 +1,6 @@
 package pl.mbalcer.cmd;
 
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.WorkTime;
@@ -10,6 +11,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Dependent
 @Command(name = "save", mixinStandardHelpOptions = true)
 public class SaveCommand implements Runnable {
@@ -36,6 +38,6 @@ public class SaveCommand implements Runnable {
         }
 
         workTimeRepository.persist(todayWorkTime);
-        System.out.println(todayWorkTime);
+        log.info("Working time has been created: {}", todayWorkTime);
     }
 }

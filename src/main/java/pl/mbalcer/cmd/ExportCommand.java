@@ -1,5 +1,6 @@
 package pl.mbalcer.cmd;
 
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.MonthYear;
@@ -13,6 +14,7 @@ import javax.transaction.Transactional;
 import java.nio.file.Path;
 import java.time.LocalDate;
 
+@Slf4j
 @Dependent
 @Command(name = "export", mixinStandardHelpOptions = true)
 public class ExportCommand implements Runnable {
@@ -41,5 +43,6 @@ public class ExportCommand implements Runnable {
         String monthlyWorkTimeReport = reportService.createMonthlyWorkTimeReport(monthYear);
 
         fileService.saveFile(path, monthlyWorkTimeReport, monthYear);
+        log.info("Content has been written to a file: {}", path);
     }
 }

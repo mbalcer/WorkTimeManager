@@ -1,5 +1,6 @@
 package pl.mbalcer.cmd;
 
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.MonthYear;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 @Dependent
 @Command(name = "history",
         mixinStandardHelpOptions = true,
@@ -54,6 +56,6 @@ public class HistoryCommand implements Runnable {
         MonthYear monthYear = monthYearRepository.findByMonthAndYear(localDate.getMonthValue(), localDate.getYear());
         WorkTime workTime = new WorkTime(startTime, endTime, localDate.getDayOfMonth(), monthYear);
         workTimeRepository.persist(workTime);
-        System.out.println(workTime);
+        log.info("Working time has been created: {}", workTime);
     }
 }

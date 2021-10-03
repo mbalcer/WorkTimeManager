@@ -1,5 +1,6 @@
 package pl.mbalcer.cmd;
 
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.MonthYear;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 
+@Slf4j
 @Dependent
 @Command(name = "print", mixinStandardHelpOptions = true)
 public class PrintCommand implements Runnable {
@@ -33,6 +35,6 @@ public class PrintCommand implements Runnable {
         }
         MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, today.getYear());
         String report = reportService.createMonthlyWorkTimeReport(monthYear);
-        System.out.println(report);
+        log.info("Monthly work time report: \n{}", report);
     }
 }

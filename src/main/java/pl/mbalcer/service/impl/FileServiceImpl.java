@@ -1,5 +1,6 @@
 package pl.mbalcer.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.service.FileService;
 
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @ApplicationScoped
+@Slf4j
 public class FileServiceImpl implements FileService {
     private final String formatFilename = "%02d. %d";
 
@@ -19,14 +21,14 @@ public class FileServiceImpl implements FileService {
             try {
                 Files.createFile(filePath);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("An error occurred while creating a file: {}", filePath);
             }
         }
 
         try {
             Files.writeString(filePath, body);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("An error occurred while writing content to the file: {}", filePath);
         }
     }
 }
