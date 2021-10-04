@@ -6,4 +6,6 @@ import java.nio.file.Path;
 
 public interface FileService {
     void saveFile(Path path, String body, MonthYear monthYear);
+
+    void createDirectory(Path path);
 }

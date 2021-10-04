@@ -11,6 +11,7 @@ import pl.mbalcer.service.ReportService;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 
@@ -18,18 +19,25 @@ import java.time.LocalDate;
 @Dependent
 @Command(name = "export", mixinStandardHelpOptions = true)
 public class ExportCommand implements Runnable {
+    private static final String WORK_TIME = "work-time";
+
+    @Option(names = {"--directory", "--dir", "-d"}, defaultValue = "C:/")
+    String directory;
 
     @Option(names = {"--month", "-m"})
     Integer month;
+
+    @Option(names = {"--year", "-y"})
+    Integer year;
 
     @Inject
     FileService fileService;
 
     @Inject
-    MonthYearRepository monthYearRepository;
+    ReportService reportService;
 
     @Inject
-    ReportService reportService;
+    MonthYearRepository monthYearRepository;
 
     @Transactional
     @Override
@@ -37,9 +45,15 @@ public class ExportCommand implements Runnable {
         if (month == null) {
             month = LocalDate.now().getMonthValue();
         }
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        Path path = Path.of(directory).resolve(WORK_TIME);
+        if (!Files.exists(path)) {
+            fileService.createDirectory(path);
+        }
 
-        Path path = Path.of("D:/");
-        MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, 2021);
+        MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, year);
         String monthlyWorkTimeReport = reportService.createMonthlyWorkTimeReport(monthYear);
 
         fileService.saveFile(path, monthlyWorkTimeReport, monthYear);

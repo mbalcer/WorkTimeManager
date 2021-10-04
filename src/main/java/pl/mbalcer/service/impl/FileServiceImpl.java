@@ -31,4 +31,13 @@ public class FileServiceImpl implements FileService {
             log.error("An error occurred while writing content to the file: {}", filePath);
         }
     }
+
+    @Override
+    public void createDirectory(Path path) {
+        try {
+            Files.createDirectory(path);
+        } catch (IOException e) {
+            log.error("An error occurred while creating a directory: {}", path);
+        }
+    }
 }
