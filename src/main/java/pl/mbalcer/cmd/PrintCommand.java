@@ -20,6 +20,9 @@ public class PrintCommand implements Runnable {
     @Option(names = {"--month", "-m"})
     Integer month;
 
+    @Option(names = {"--year", "-y"})
+    Integer year;
+
     @Inject
     MonthYearRepository monthYearRepository;
 
@@ -33,7 +36,10 @@ public class PrintCommand implements Runnable {
         if (month == null) {
             month = today.getMonthValue();
         }
-        MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, today.getYear());
+        if (year == null) {
+            year = today.getYear();
+        }
+        MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, year);
         String report = reportService.createMonthlyWorkTimeReport(monthYear);
         log.info("Monthly work time report: \n{}", report);
     }

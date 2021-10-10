@@ -7,6 +7,7 @@ import pl.mbalcer.service.ReportService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -21,6 +22,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String createMonthlyWorkTimeReport(MonthYear monthYear) {
         List<WorkTime> workTimeByMonth = workTimeRepository.findAllByMonth(monthYear);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         String workTimeReport = workTimeByMonth.stream()
                 .sorted(Comparator.comparing(WorkTime::getDayOfMonth))
                 .map(workTime -> {
@@ -30,8 +32,8 @@ public class ReportServiceImpl implements ReportService {
                     return String.format("%02d.%02d %s - %s (%02d:%02d)",
                             workTime.getDayOfMonth(),
                             workTime.getMonthYear().getMonth(),
-                            workTime.getStartTime().toString(),
-                            workTime.getEndTime().toString(),
+                            workTime.getStartTime().format(timeFormatter),
+                            workTime.getEndTime().format(timeFormatter),
                             hours, minutes - (hours * 60));
                 })
                 .collect(Collectors.joining("\n"));
