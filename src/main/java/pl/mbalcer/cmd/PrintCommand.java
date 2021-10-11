@@ -14,13 +14,21 @@ import java.time.LocalDate;
 
 @Slf4j
 @Dependent
-@Command(name = "print", mixinStandardHelpOptions = true)
+@Command(name = "print",
+        mixinStandardHelpOptions = true,
+        sortOptions = false,
+        version = "Work Time Manager 1.0",
+        header = "Print monthly work time report",
+        description = "The command prints monthly work time report.",
+        synopsisHeading = "%n",
+        descriptionHeading = "%nDescription:%n",
+        optionListHeading = "%nOptions:%n")
 public class PrintCommand implements Runnable {
 
-    @Option(names = {"--month", "-m"})
+    @Option(names = {"--month", "-m"}, description = "Month from which the report is to be printed")
     Integer month;
 
-    @Option(names = {"--year", "-y"})
+    @Option(names = {"--year", "-y"}, description = "Year from which the report is to be printed")
     Integer year;
 
     @Inject
