@@ -23,7 +23,6 @@ import java.time.format.DateTimeFormatter;
         version = "Work Time Manager 1.0",
         header = "Save historical work time",
         description = "You can save the working time from another day",
-        headerHeading = "Usage:%n%n",
         synopsisHeading = "%n",
         descriptionHeading = "%nDescription:%n",
         optionListHeading = "%nOptions:%n")

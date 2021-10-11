@@ -13,13 +13,21 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Dependent
-@Command(name = "save", mixinStandardHelpOptions = true)
+@Command(name = "save",
+        mixinStandardHelpOptions = true,
+        sortOptions = false,
+        version = "Work Time Manager 1.0",
+        header = "Save today's working time",
+        description = "The command saves current work time to database. You can define start or end work time.",
+        synopsisHeading = "%n",
+        descriptionHeading = "%nDescription:%n",
+        optionListHeading = "%nOptions:%n")
 public class SaveCommand implements Runnable {
 
-    @Option(names = {"--start", "-s"})
+    @Option(names = {"--start", "-s"}, description = "Save start of working time")
     boolean start;
 
-    @Option(names = {"--end", "-e"})
+    @Option(names = {"--end", "-e"}, description = "Save end of working time")
     boolean end;
 
     @Inject
