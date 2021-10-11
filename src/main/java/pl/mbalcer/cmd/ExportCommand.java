@@ -17,17 +17,23 @@ import java.time.LocalDate;
 
 @Slf4j
 @Dependent
-@Command(name = "export", mixinStandardHelpOptions = true)
+@Command(name = "export",
+        mixinStandardHelpOptions = true,
+        sortOptions = false,
+        version = "Work Time Manager 1.0",
+        header = "Export work time report to file",
+        description = "The command creates a file with the name of a given month in a given directory and writes a work time report in it",
+        synopsisHeading = "%n",
+        descriptionHeading = "%nDescription:%n",
+        optionListHeading = "%nOptions:%n")
 public class ExportCommand implements Runnable {
-    private static final String WORK_TIME = "work-time";
-
-    @Option(names = {"--directory", "--dir", "-d"}, defaultValue = "C:/")
+    @Option(names = {"--directory", "--dir", "-d"}, required = true, description = "Path to the directory where the application is to save the reports")
     String directory;
 
-    @Option(names = {"--month", "-m"})
+    @Option(names = {"--month", "-m"}, description = "Month from which the report is to be generated")
     Integer month;
 
-    @Option(names = {"--year", "-y"})
+    @Option(names = {"--year", "-y"}, description = "Year from which the report is to be generated")
     Integer year;
 
     @Inject
@@ -48,15 +54,15 @@ public class ExportCommand implements Runnable {
         if (year == null) {
             year = LocalDate.now().getYear();
         }
-        Path path = Path.of(directory).resolve(WORK_TIME);
+        Path path = Path.of(directory);
         if (!Files.exists(path)) {
-            fileService.createDirectory(path);
+            log.error("The directory specified as a parameter doesn't exist");
+        } else {
+            MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, year);
+            String monthlyWorkTimeReport = reportService.createMonthlyWorkTimeReport(monthYear);
+
+            fileService.saveFile(path, monthlyWorkTimeReport, monthYear);
+            log.info("Content has been written to a file: {}", path);
         }
-
-        MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, year);
-        String monthlyWorkTimeReport = reportService.createMonthlyWorkTimeReport(monthYear);
-
-        fileService.saveFile(path, monthlyWorkTimeReport, monthYear);
-        log.info("Content has been written to a file: {}", path);
     }
 }
