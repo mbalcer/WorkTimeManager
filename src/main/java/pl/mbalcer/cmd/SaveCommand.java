@@ -39,13 +39,23 @@ public class SaveCommand implements Runnable {
         LocalDateTime now = LocalDateTime.now();
         WorkTime todayWorkTime = workTimeRepository.findTodayWorkTime(now);
         if (start) {
+            if (todayWorkTime.getEndTime() != null && now.toLocalTime().isAfter(todayWorkTime.getEndTime())) {
+                log.info("The start of the working time cannot be after the ending.");
+                log.info("The end of the working time was cleared.");
+                todayWorkTime.setEndTime(null);
+            }
             todayWorkTime.setStartTime(now.toLocalTime());
         }
         if (end) {
+            if (todayWorkTime.getStartTime() != null && now.toLocalTime().isBefore(todayWorkTime.getStartTime())) {
+                log.info("The end of the working time cannot be before the starting.");
+                log.info("The start of the working time was cleared.");
+                todayWorkTime.setStartTime(null);
+            }
             todayWorkTime.setEndTime(now.toLocalTime());
         }
 
         workTimeRepository.persist(todayWorkTime);
-        log.info("Working time has been created: {}", todayWorkTime);
+        log.info("Working time has been created/updated: {}", todayWorkTime);
     }
 }
