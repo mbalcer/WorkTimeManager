@@ -14,6 +14,7 @@ public class WorkTimeManager implements QuarkusApplication {
     @Inject PrintCommand printCommand;
     @Inject HistoryCommand historyCommand;
     @Inject ExportCommand exportCommand;
+    @Inject CalculateCommand calculateCommand;
 
     public static void main(String[] args) {
         Quarkus.run(WorkTimeManager.class, args);
@@ -26,6 +27,7 @@ public class WorkTimeManager implements QuarkusApplication {
                 .addSubcommand(printCommand)
                 .addSubcommand(historyCommand)
                 .addSubcommand(exportCommand)
+                .addSubcommand(calculateCommand)
                 .execute(args);
     }
 }
