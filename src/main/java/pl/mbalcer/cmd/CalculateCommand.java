@@ -7,6 +7,7 @@ import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
 import pl.mbalcer.repository.MonthYearRepository;
 import pl.mbalcer.repository.WorkTimeRepository;
+import pl.mbalcer.service.WorkingDaysService;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
@@ -27,6 +28,12 @@ import java.util.List;
         descriptionHeading = "%nDescription:%n",
         optionListHeading = "%nOptions:%n")
 public class CalculateCommand implements Runnable {
+    @Option(names = {"--sum", "-s"}, description = "")
+    boolean sum;
+
+    @Option(names = {"--working-hours", "-wh"}, description = "")
+    boolean workingHours;
+
     @Option(names = {"--month", "-m"}, description = "")
     Integer month;
 
@@ -39,6 +46,9 @@ public class CalculateCommand implements Runnable {
     @Inject
     MonthYearRepository monthYearRepository;
 
+    @Inject
+    WorkingDaysService workingDaysService;
+
     @Override
     @Transactional
     public void run() {
@@ -49,15 +59,22 @@ public class CalculateCommand implements Runnable {
         if (year == null) {
             year = now.getYear();
         }
-
         MonthYear monthYear = monthYearRepository.findByMonthAndYear(month, year);
-        List<WorkTime> workTimes = workTimeRepository.findAllByMonth(monthYear);
-        long sumMinutes = workTimes.stream()
-                .filter(workTime -> workTime.getStartTime() != null && workTime.getEndTime() != null)
-                .mapToLong(workTime -> ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()))
-                .sum();
-        long sumHours = sumMinutes / 60;
 
-        log.info(String.format("You worked %d hours and %d minutes in a month (%d.%d)", sumHours, sumMinutes - (sumHours * 60), month, year));
+        if (sum) {
+            List<WorkTime> workTimes = workTimeRepository.findAllByMonth(monthYear);
+            long sumMinutes = workTimes.stream()
+                    .filter(workTime -> workTime.getStartTime() != null && workTime.getEndTime() != null)
+                    .mapToLong(workTime -> ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()))
+                    .sum();
+            long sumHours = sumMinutes / 60;
+
+            log.info(String.format("You worked %d hours and %d minutes in a month (%d.%d)", sumHours, sumMinutes - (sumHours * 60), month, year));
+        }
+        if (workingHours) {
+            int workingDays = workingDaysService.calculate(monthYear);
+
+            log.info(String.format("There are %d working hours per month (%d.%d)", workingDays * 8, monthYear.getMonth(), monthYear.getYear()));
+        }
     }
 }
