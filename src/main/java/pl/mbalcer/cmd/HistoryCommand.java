@@ -31,10 +31,10 @@ public class HistoryCommand implements Runnable {
     @Option(names = {"--date", "-d"}, required = true, description = "Date in format dd.MM.yyyy")
     String date;
 
-    @Option(names = {"--start", "-s"}, defaultValue = "8:00", description = "Start working time in format HH:mm")
+    @Option(names = {"--start", "-s"}, description = "Start working time in format HH:mm")
     String start;
 
-    @Option(names = {"--end", "-e"}, defaultValue = "16:00", description = "End working time in format HH:mm")
+    @Option(names = {"--end", "-e"}, description = "End working time in format HH:mm")
     String end;
 
     @Inject
@@ -49,12 +49,29 @@ public class HistoryCommand implements Runnable {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d.M.yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:m");
         LocalDate localDate = LocalDate.parse(date, dateFormatter);
-        LocalTime startTime = LocalTime.parse(start, timeFormatter);
-        LocalTime endTime = LocalTime.parse(end, timeFormatter);
+        LocalTime startTime = null, endTime = null;
+        if (start != null) {
+            startTime = LocalTime.parse(start, timeFormatter);
+        }
+        if (end != null) {
+            endTime = LocalTime.parse(end, timeFormatter);
+        }
 
         MonthYear monthYear = monthYearRepository.findByMonthAndYear(localDate.getMonthValue(), localDate.getYear());
-        WorkTime workTime = new WorkTime(startTime, endTime, localDate.getDayOfMonth(), monthYear);
-        workTimeRepository.persist(workTime);
-        log.info("Working time has been created: {}", workTime);
+        WorkTime currentWorkTime = workTimeRepository.findByDate(localDate);
+        if (currentWorkTime != null) {
+            if (startTime != null) {
+                currentWorkTime.setStartTime(startTime);
+            }
+            if (endTime != null) {
+                currentWorkTime.setEndTime(endTime);
+            }
+        } else {
+            LocalTime startTimeToSave = (startTime == null) ? LocalTime.of(8, 0) : startTime;
+            LocalTime endTimeToSave = (endTime == null) ? LocalTime.of(16, 0) : endTime;
+            currentWorkTime = new WorkTime(startTimeToSave, endTimeToSave, localDate.getDayOfMonth(), monthYear);
+        }
+        workTimeRepository.persist(currentWorkTime);
+        log.info("Working time has been created: {}", currentWorkTime);
     }
 }
