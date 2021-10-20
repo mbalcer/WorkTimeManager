@@ -1,15 +1,26 @@
 package pl.mbalcer.service.impl;
 
 import pl.mbalcer.model.MonthYear;
-import pl.mbalcer.service.WorkingDaysService;
+import pl.mbalcer.model.WorkTime;
+import pl.mbalcer.service.CalculateService;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @ApplicationScoped
-public class WorkingDaysServiceImpl implements WorkingDaysService {
+public class CalculateServiceImpl implements CalculateService {
     @Override
-    public int calculate(MonthYear monthYear) {
+    public long calculateSumWorkingMinutes(List<WorkTime> workTimeList) {
+        return workTimeList.stream()
+                .filter(workTime -> workTime.getStartTime() != null && workTime.getEndTime() != null)
+                .mapToLong(workTime -> ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()))
+                .sum();
+    }
+
+    @Override
+    public int calculateWorkingDays(MonthYear monthYear) {
         LocalDate firstDayInMonth = LocalDate.of(monthYear.getYear(), monthYear.getMonth(), 1);
 
         int workingDays = 0;

@@ -7,13 +7,12 @@ import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
 import pl.mbalcer.repository.MonthYearRepository;
 import pl.mbalcer.repository.WorkTimeRepository;
-import pl.mbalcer.service.WorkingDaysService;
+import pl.mbalcer.service.CalculateService;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Slf4j
@@ -47,7 +46,7 @@ public class CalculateCommand implements Runnable {
     MonthYearRepository monthYearRepository;
 
     @Inject
-    WorkingDaysService workingDaysService;
+    CalculateService calculateService;
 
     @Override
     @Transactional
@@ -63,16 +62,13 @@ public class CalculateCommand implements Runnable {
 
         if (sum) {
             List<WorkTime> workTimes = workTimeRepository.findAllByMonth(monthYear);
-            long sumMinutes = workTimes.stream()
-                    .filter(workTime -> workTime.getStartTime() != null && workTime.getEndTime() != null)
-                    .mapToLong(workTime -> ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()))
-                    .sum();
+            long sumMinutes = calculateService.calculateSumWorkingMinutes(workTimes);
             long sumHours = sumMinutes / 60;
 
             log.info(String.format("You worked %d hours and %d minutes in a month (%d.%d)", sumHours, sumMinutes - (sumHours * 60), month, year));
         }
         if (workingHours) {
-            int workingDays = workingDaysService.calculate(monthYear);
+            int workingDays = calculateService.calculateWorkingDays(monthYear);
 
             log.info(String.format("There are %d working hours per month (%d.%d)", workingDays * 8, monthYear.getMonth(), monthYear.getYear()));
         }
