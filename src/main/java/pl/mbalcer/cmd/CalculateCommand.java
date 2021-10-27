@@ -1,6 +1,7 @@
 package pl.mbalcer.cmd;
 
 import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import pl.mbalcer.model.MonthYear;
@@ -27,11 +28,19 @@ import java.util.List;
         descriptionHeading = "%nDescription:%n",
         optionListHeading = "%nOptions:%n")
 public class CalculateCommand implements Runnable {
+    @ArgGroup(exclusive = false)
+    WorkingHours workingHours;
+
+    static class WorkingHours {
+        @Option(names = {"--working-hours", "-wh"}, description = "")
+        boolean show;
+
+        @Option(names = {"--free-days", "-fd"}, defaultValue = "0", description = "")
+        int freeDays;
+    }
+
     @Option(names = {"--sum", "-s"}, description = "")
     boolean sum;
-
-    @Option(names = {"--working-hours", "-wh"}, description = "")
-    boolean workingHours;
 
     @Option(names = {"--month", "-m"}, description = "")
     Integer month;
@@ -67,8 +76,8 @@ public class CalculateCommand implements Runnable {
 
             log.info(String.format("You worked %d hours and %d minutes in a month (%d.%d)", sumHours, sumMinutes - (sumHours * 60), month, year));
         }
-        if (workingHours) {
-            int workingDays = calculateService.calculateWorkingDays(monthYear);
+        if (workingHours.show) {
+            int workingDays = calculateService.calculateWorkingDays(monthYear, workingHours.freeDays);
 
             log.info(String.format("There are %d working hours per month (%d.%d)", workingDays * 8, monthYear.getMonth(), monthYear.getYear()));
         }

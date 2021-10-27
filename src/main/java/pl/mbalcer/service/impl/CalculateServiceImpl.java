@@ -20,7 +20,7 @@ public class CalculateServiceImpl implements CalculateService {
     }
 
     @Override
-    public int calculateWorkingDays(MonthYear monthYear) {
+    public int calculateWorkingDays(MonthYear monthYear, int freeDays) {
         LocalDate firstDayInMonth = LocalDate.of(monthYear.getYear(), monthYear.getMonth(), 1);
 
         int workingDays = 0;
@@ -32,6 +32,6 @@ public class CalculateServiceImpl implements CalculateService {
             }
         }
 
-        return workingDays;
+        return workingDays - freeDays;
     }
 }
