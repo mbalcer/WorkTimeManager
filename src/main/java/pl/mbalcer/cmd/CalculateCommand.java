@@ -22,8 +22,8 @@ import java.util.List;
         mixinStandardHelpOptions = true,
         sortOptions = false,
         version = "Work Time Manager 1.0",
-        header = "",
-        description = "",
+        header = "Working time calculator",
+        description = "The command calculates the sum of your working hours in the month and sum of hours which you must work in the month",
         synopsisHeading = "%n",
         descriptionHeading = "%nDescription:%n",
         optionListHeading = "%nOptions:%n")
@@ -32,20 +32,20 @@ public class CalculateCommand implements Runnable {
     WorkingHours workingHours;
 
     static class WorkingHours {
-        @Option(names = {"--working-hours", "-wh"}, description = "")
+        @Option(names = {"--working-hours", "-wh"}, description = "Show the sum of hours which you must work")
         boolean show;
 
-        @Option(names = {"--free-days", "-fd"}, defaultValue = "0", description = "")
+        @Option(names = {"--free-days", "-fd"}, defaultValue = "0", description = "The number of additional days off in a given month")
         int freeDays;
     }
 
-    @Option(names = {"--sum", "-s"}, description = "")
+    @Option(names = {"--sum", "-s"}, description = "Show the sum of your working hours")
     boolean sum;
 
-    @Option(names = {"--month", "-m"}, description = "")
+    @Option(names = {"--month", "-m"}, description = "Month for calculation")
     Integer month;
 
-    @Option(names = {"--year", "-y"}, description = "")
+    @Option(names = {"--year", "-y"}, description = "Year for calculation")
     Integer year;
 
     @Inject
