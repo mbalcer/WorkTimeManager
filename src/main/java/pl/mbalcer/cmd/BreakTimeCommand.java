@@ -7,13 +7,13 @@ import pl.mbalcer.model.BreakTime;
 import pl.mbalcer.model.WorkTime;
 import pl.mbalcer.repository.BreakTimeRepository;
 import pl.mbalcer.repository.WorkTimeRepository;
+import pl.mbalcer.util.DateConstant;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Dependent
@@ -45,14 +45,12 @@ public class BreakTimeCommand implements Runnable {
     @Transactional
     @Override
     public void run() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d.M.yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:m");
         LocalDate localDate = LocalDate.now();
         if (date != null) {
-            localDate = LocalDate.parse(date, dateFormatter);
+            localDate = LocalDate.parse(date, DateConstant.DATE_FORMATTER);
         }
-        LocalTime startBreak = LocalTime.parse(start, timeFormatter);
-        LocalTime endBreak = LocalTime.parse(end, timeFormatter);
+        LocalTime startBreak = LocalTime.parse(start, DateConstant.TIME_FORMATTER);
+        LocalTime endBreak = LocalTime.parse(end, DateConstant.TIME_FORMATTER);
         if (startBreak.isAfter(endBreak)) {
             throw new IllegalArgumentException("The start of the break must be before the end of the break");
         }

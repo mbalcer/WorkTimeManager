@@ -7,13 +7,13 @@ import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
 import pl.mbalcer.repository.MonthYearRepository;
 import pl.mbalcer.repository.WorkTimeRepository;
+import pl.mbalcer.util.DateConstant;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Dependent
@@ -46,15 +46,13 @@ public class HistoryCommand implements Runnable {
     @Transactional
     @Override
     public void run() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d.M.yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:m");
-        LocalDate localDate = LocalDate.parse(date, dateFormatter);
+        LocalDate localDate = LocalDate.parse(date, DateConstant.DATE_FORMATTER);
         LocalTime startTime = null, endTime = null;
         if (start != null) {
-            startTime = LocalTime.parse(start, timeFormatter);
+            startTime = LocalTime.parse(start, DateConstant.TIME_FORMATTER);
         }
         if (end != null) {
-            endTime = LocalTime.parse(end, timeFormatter);
+            endTime = LocalTime.parse(end, DateConstant.TIME_FORMATTER);
         }
 
         MonthYear monthYear = monthYearRepository.findByMonthAndYear(localDate.getMonthValue(), localDate.getYear());
@@ -67,8 +65,8 @@ public class HistoryCommand implements Runnable {
                 currentWorkTime.setEndTime(endTime);
             }
         } else {
-            LocalTime startTimeToSave = (startTime == null) ? LocalTime.of(8, 0) : startTime;
-            LocalTime endTimeToSave = (endTime == null) ? LocalTime.of(16, 0) : endTime;
+            LocalTime startTimeToSave = (startTime == null) ? DateConstant.START_WORK_DEFAULT : startTime;
+            LocalTime endTimeToSave = (endTime == null) ? DateConstant.END_WORK_DEFAULT : endTime;
             currentWorkTime = new WorkTime(startTimeToSave, endTimeToSave, localDate.getDayOfMonth(), monthYear);
         }
         workTimeRepository.persist(currentWorkTime);
