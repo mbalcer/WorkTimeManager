@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Break {
+public class BreakTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,4 +20,10 @@ public class Break {
 
     @ManyToOne
     private WorkTime workTime;
+
+    public BreakTime(LocalTime startBreak, LocalTime endBreak, WorkTime workTime) {
+        this.startBreak = startBreak;
+        this.endBreak = endBreak;
+        this.workTime = workTime;
+    }
 }
