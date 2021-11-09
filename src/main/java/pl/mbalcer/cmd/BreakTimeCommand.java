@@ -21,19 +21,19 @@ import java.time.LocalTime;
         mixinStandardHelpOptions = true,
         sortOptions = false,
         version = "Work Time Manager 1.0",
-        header = "",
-        description = "",
+        header = "Save break times in the day",
+        description = "The command allows you to save the break times on a specific day. The break will be subtracted from the working time.",
         synopsisHeading = "%n",
         descriptionHeading = "%nDescription:%n",
         optionListHeading = "%nOptions:%n")
 public class BreakTimeCommand implements Runnable {
-    @Option(names = {"--date", "-d"})
+    @Option(names = {"--date", "-d"}, description = "Date in format dd.MM.yyyy")
     String date;
 
-    @Option(names = {"--start", "-s"}, required = true)
+    @Option(names = {"--start", "-s"}, required = true, description = "Start break time in format HH:mm")
     String start;
 
-    @Option(names = {"--end", "-e"}, required = true)
+    @Option(names = {"--end", "-e"}, required = true, description = "End break time in format HH:mm")
     String end;
 
     @Inject
