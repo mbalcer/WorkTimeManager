@@ -1,22 +1,41 @@
 package pl.mbalcer.service.impl;
 
+import pl.mbalcer.model.BreakTime;
 import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
+import pl.mbalcer.repository.BreakTimeRepository;
 import pl.mbalcer.service.CalculateService;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @ApplicationScoped
 public class CalculateServiceImpl implements CalculateService {
+    @Inject
+    BreakTimeRepository breakTimeRepository;
+
     @Override
     public long calculateSumWorkingMinutes(List<WorkTime> workTimeList) {
         return workTimeList.stream()
                 .filter(workTime -> workTime.getStartTime() != null && workTime.getEndTime() != null)
-                .mapToLong(workTime -> ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()))
+                .mapToLong(workTime -> calculateWorkingMinutesInTheDay(workTime))
                 .sum();
+    }
+
+    @Override
+    public long calculateWorkingMinutesInTheDay(WorkTime workTime) {
+        List<BreakTime> breaksInDay = breakTimeRepository.findByWorkTime(workTime);
+        long sumBreaks = 0;
+        if (breaksInDay.size() > 0) {
+            sumBreaks = breaksInDay.stream()
+                    .mapToLong(breakTime -> ChronoUnit.MINUTES.between(breakTime.getStartBreak(), breakTime.getEndBreak()))
+                    .sum();
+        }
+
+        return ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime()) - sumBreaks;
     }
 
     @Override

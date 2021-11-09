@@ -5,12 +5,12 @@ import pl.mbalcer.model.MonthYear;
 import pl.mbalcer.model.WorkTime;
 import pl.mbalcer.repository.BreakTimeRepository;
 import pl.mbalcer.repository.WorkTimeRepository;
+import pl.mbalcer.service.CalculateService;
 import pl.mbalcer.service.ReportService;
 import pl.mbalcer.util.DateConstant;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,17 +26,18 @@ public class ReportServiceImpl implements ReportService {
     @Inject
     BreakTimeRepository breakTimeRepository;
 
+    @Inject
+    CalculateService calculateService;
+
     @Override
     public String createMonthlyWorkTimeReport(MonthYear monthYear) {
         List<WorkTime> workTimeByMonth = workTimeRepository.findAllByMonth(monthYear);
-        String workTimeReport = workTimeByMonth.stream()
+
+        return workTimeByMonth.stream()
                 .sorted(Comparator.comparing(WorkTime::getDayOfMonth))
                 .map(workTime -> {
-                    long hours = 0, minutes = 0;
-                    if (workTime.getStartTime() != null && workTime.getEndTime() != null) {
-                        minutes = ChronoUnit.MINUTES.between(workTime.getStartTime(), workTime.getEndTime());
-                        hours = ChronoUnit.HOURS.between(workTime.getStartTime(), workTime.getEndTime());
-                    }
+                    long minutes = calculateService.calculateWorkingMinutesInTheDay(workTime);
+                    long hours = minutes / 60;
 
                     return String.format(DAY_REPORT_FORMAT,
                             workTime.getDayOfMonth(),
@@ -47,8 +48,6 @@ public class ReportServiceImpl implements ReportService {
                             + getBreaksInDayReport(workTime);
                 })
                 .collect(Collectors.joining("\n"));
-
-        return workTimeReport;
     }
 
     private String getBreaksInDayReport(WorkTime workTime) {

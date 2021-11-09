@@ -76,7 +76,7 @@ public class CalculateCommand implements Runnable {
 
             log.info(String.format("You worked %d hours and %d minutes in a month (%d.%d)", sumHours, sumMinutes - (sumHours * 60), month, year));
         }
-        if (workingHours.show) {
+        if (workingHours != null && workingHours.show) {
             int workingDays = calculateService.calculateWorkingDays(monthYear, workingHours.freeDays);
 
             log.info(String.format("There are %d working hours per month (%d.%d)", workingDays * 8, monthYear.getMonth(), monthYear.getYear()));
